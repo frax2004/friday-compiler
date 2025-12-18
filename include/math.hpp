@@ -20,6 +20,30 @@ namespace fridayc::math {
   using std::clamp;
   using std::max;
   using std::min;
+  using std::abs;
+  using std::hypot;
+  using std::ceil;
+  using std::floor;
+  using std::round;
+  using std::trunc;
+  using std::copysign;
+  using std::isfinite;
+  using std::isinf;
+  using std::isnan;
+
+  using std::numbers::e;
+  using std::numbers::log2e;
+  using std::numbers::log10e;
+  using std::numbers::pi;
+  using std::numbers::inv_pi;
+  using std::numbers::inv_sqrtpi;
+  using std::numbers::ln2;
+  using std::numbers::ln10;
+  using std::numbers::sqrt2;
+  using std::numbers::sqrt3;
+  using std::numbers::inv_sqrt3;
+  using std::numbers::egamma;
+  using std::numbers::phi;
 
 }
 
