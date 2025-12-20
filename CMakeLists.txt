@@ -40,7 +40,8 @@ target_precompile_headers(fridaylib PRIVATE ${PRECOMPILED_HEADERS})
 # ---------------------------------------------------------
 # MAIN SECTION
 # ---------------------------------------------------------
-add_executable(fridayc src/main.cpp)
+add_executable(fridayc src/Main.cpp)
+target_include_directories(fridayc PRIVATE include)
 target_link_directories(fridayc PRIVATE lib)
 target_link_libraries(fridayc PRIVATE fridaylib stdc++exp)
 target_precompile_headers(fridayc PRIVATE ${PRECOMPILED_HEADERS})

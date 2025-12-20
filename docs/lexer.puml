@@ -1,0 +1,23 @@
+@startuml "Lexer"
+
+!theme blueprint
+
+namespace lexer {
+
+  enum TokenType {
+
+  }
+
+  struct Token {
+
+  }
+
+  namespace tokens {
+
+  }
+
+  
+
+}
+
+@enduml
