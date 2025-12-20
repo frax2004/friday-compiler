@@ -5,7 +5,7 @@
 namespace lexer {
 
   enum TokenType {
-
+    
   }
 
   struct Token {
@@ -16,8 +16,23 @@ namespace lexer {
 
   }
 
-  
+  class Tokenizer {
 
+  }
+
+  class Parser {
+    
+  }
+
+  class Compiler {
+
+  }
+
+  class Interpreter {
+
+  }
+
+  
 }
 
 @enduml
