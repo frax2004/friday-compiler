@@ -1,8 +1,6 @@
 #ifndef FRIDAYC_CTYPES_HPP
 #define FRIDAYC_CTYPES_HPP
 
-
-
 extern "C" {
   using i8 = char;
   using i16 = short;

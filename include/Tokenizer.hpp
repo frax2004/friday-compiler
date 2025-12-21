@@ -9,12 +9,38 @@ namespace fridayc {
 
     public:
     struct iterator {
-      std::string_view data;
-      constexpr auto operator==(iterator const& rhs) const noexcept -> bool = default;
-      constexpr auto operator!=(iterator const& rhs) const noexcept -> bool = default;
 
+      public:
+      std::string_view data = "";
+      
+      private:
+      u64 row = 0;
+      u64 col = 0;
+      u64 stride = 0;
+      Token::Type type = Token::Type::END;
+
+      public:
+      using iterator_category = std::forward_iterator_tag;
+      using iterator_concept = std::forward_iterator_tag;
       using value_type = Token;
       using difference_type = std::ptrdiff_t;
+
+      constexpr iterator() noexcept = default;
+      constexpr iterator(std::string_view raw, u64 row, u64 col) noexcept;
+      constexpr auto operator==(iterator const& rhs) const noexcept -> bool = default;
+      constexpr auto operator*() const noexcept -> Token;
+      constexpr auto operator++() noexcept -> Tokenizer::iterator&;
+      constexpr auto operator++(int) noexcept -> Tokenizer::iterator;
+
+      private:
+      constexpr auto advance() noexcept -> void;
+      constexpr auto peek(u64 ahead = 0) const noexcept -> Character;
+      constexpr auto consume() noexcept -> void;
+      constexpr auto consumeIdentifier() noexcept -> void;
+      constexpr auto consumeNumber() noexcept -> void;
+      constexpr auto consumeSymbol() noexcept -> void;
+      constexpr auto consumeStringLiteral() noexcept -> void;
+      constexpr auto consumeCharacterLiteral() noexcept -> void;
     };
 
     private:
@@ -26,17 +52,17 @@ namespace fridayc {
     constexpr Tokenizer(Tokenizer &&) noexcept = default;
     constexpr auto operator==(Tokenizer const&) const noexcept -> bool = default;
 
+    constexpr auto size() const noexcept -> u64;
     constexpr auto begin() const noexcept -> iterator;
     constexpr auto end() const noexcept -> iterator;
 
-    template<template<class T> class Container>
-    requires std::same_as<Token, typename Container<Token>::value_type>
-    constexpr auto collect() const noexcept -> Container<Token>;
+    constexpr auto Tokenizer::collect() const noexcept {
+      constexpr u64 N = size();
+      std::array<Token, N> tokens;
+      std::copy(this->begin(), this->end(), tokens.begin());
+      return std::move(tokens);
+    }
   };
-
-  constexpr auto operator*(Tokenizer::iterator const& lhs) noexcept -> Token;
-  constexpr auto operator++(Tokenizer::iterator& lhs) noexcept -> Tokenizer::iterator&;
-  constexpr auto operator++(Tokenizer::iterator& lhs, int) noexcept -> Tokenizer::iterator;
 }
 
 #include "Tokenizer.inl"

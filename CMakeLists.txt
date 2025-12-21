@@ -7,13 +7,13 @@ project(friday)
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ../lib)
-set(PRECOMPILED_HEADERS <bits/stdc++.h> include/CTypes.hpp include/FormatString.hpp)
+set(PRECOMPILED_HEADERS <bits/stdc++.h> include/CTypes.hpp include/FormatString.hpp include/Wrappers.hpp)
 
 file(GLOB ALL_SOURCES src/*.cpp)
 set(LIB_SOURCES ${ALL_SOURCES})
 list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp")
 
-add_compile_options(-fconcepts-diagnostics-depth=2)
+add_compile_options(-fconcepts-diagnostics-depth=10)
 # ---------------------------------------------------------
 
 
