@@ -29,6 +29,7 @@ namespace fridayc {
     Type type { Type::ILLEGAL };
 
     public:
+    constexpr Token() noexcept = default;
     constexpr Token(std::string_view literal, Type type, u64 row, u64 col) noexcept;
     constexpr auto operator==(Token const& other) const noexcept -> bool;
     

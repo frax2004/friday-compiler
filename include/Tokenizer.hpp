@@ -11,7 +11,7 @@ namespace fridayc {
     struct iterator {
 
       public:
-      std::string_view data = "";
+      std::string_view data;
       
       private:
       u64 row = 0;
@@ -41,6 +41,8 @@ namespace fridayc {
       constexpr auto consumeSymbol() noexcept -> void;
       constexpr auto consumeStringLiteral() noexcept -> void;
       constexpr auto consumeCharacterLiteral() noexcept -> void;
+      constexpr auto consumeIllegal() noexcept -> void;
+      constexpr auto applyStride() noexcept -> void;
     };
 
     private:
@@ -56,13 +58,16 @@ namespace fridayc {
     constexpr auto begin() const noexcept -> iterator;
     constexpr auto end() const noexcept -> iterator;
 
-    constexpr auto Tokenizer::collect() const noexcept {
-      constexpr u64 N = size();
-      std::array<Token, N> tokens;
-      std::copy(this->begin(), this->end(), tokens.begin());
-      return std::move(tokens);
-    }
+    template<template<class T> class Container>
+    requires std::same_as<Token, typename Container<Token>::value_type>
+    constexpr auto collect() const noexcept -> Container<Token>;
   };
+
+  static_assert(std::ranges::range<Tokenizer>);
+  static_assert(std::ranges::sized_range<Tokenizer>);
+  static_assert(std::ranges::forward_range<Tokenizer>);
+  static_assert(std::ranges::input_range<Tokenizer>);
+
 }
 
 #include "Tokenizer.inl"
