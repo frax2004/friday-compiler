@@ -21,9 +21,9 @@ constexpr auto tokenize() {
   return std::move(tokens);
 };
 
-auto main(i32 argc, const i8* argv[]) -> i32 {
 
-  auto tokens = Tokenizer("let x = \"HelloWorld\";").collect<std::vector>();
+auto main(i32 argc, const i8* argv[]) -> i32 {
+  
   
 
   return 0;

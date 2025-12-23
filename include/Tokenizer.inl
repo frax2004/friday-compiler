@@ -111,21 +111,174 @@ namespace fridayc {
   }
   
   constexpr auto Tokenizer::iterator::consumeSymbol() noexcept -> void {
-    
-    this->consume();
-    this->type = Token::Type::ILLEGAL;
+    switch(this->peek()) {
+      case '"': return this->consumeStringLiteral();
+      case '\'': return this->consumeCharacterLiteral();
+      case '=': {
+        consume();
+        if(peek() == '>') {
+          consume();
+          this->type == Token::Type::IMPLIES;
+        } else if(peek() == '=') {
+          consume();
+          this->type == Token::Type::EQUALS;
+        } else this->type == Token::Type::ASSIGN;
+        return;
+      } case '>': {
+        consume();
+        switch (peek()) {
+          case '=': {
+            consume();
+            this->type == Token::Type::GREATER_EQ;
+            return;
+          }
+          case '>': {
+            consume();
+            this->type = peek() == '=' ? (consume(), Token::Type::RSHIFT_EQ) : Token::Type::RSHIFT;
+            return;
+          }
+          default: this->type == Token::Type::GREATER;
+        }
+        std::unreachable();
+        return;
+      } case '<': {
+        consume();
+        switch (peek()) {
+          case '=': {
+            consume();
+            this->type == Token::Type::LESS_EQ;
+            return;
+          }
+          case '<': {
+            consume();
+            this->type = peek() == '=' ? (consume(), Token::Type::LSHIFT_EQ) : Token::Type::LSHIFT;
+            return;
+          }
+          default: this->type == Token::Type::LESS;
+        }
+        std::unreachable();
+        return;
+      } case '!': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::NOT_EQ;
+          return;
+        }
+        this->type == Token::Type::ILLEGAL;
+        return;
+      } case '+': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::PLUS_EQ;
+        }
+        this->type == Token::Type::PLUS;
+      } case '-': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::MINUS_EQ;
+        } else if(peek() == '>') {
+          consume();
+          this->type == Token::Type::ARROW;
+        }
+        this->type == Token::Type::MINUS;
+      } case '*': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::STAR_EQ;
+        }
+        this->type == Token::Type::STAR;
+      } case '/': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::SLASH_EQ;
+        }
+        this->type == Token::Type::SLASH;
+      } case '%': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::MODULO_EQ;
+        }
+        this->type == Token::Type::MODULO;
+      } case '&': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::BIT_AND_EQ;
+        } else this->type == Token::Type::BIT_AND;
+      } case '|': {
+        consume();
+        if(peek() == '=') {
+          consume();
+          this->type == Token::Type::BIT_OR_EQ;
+        } else this->type == Token::Type::BIT_OR;
+      } case '(': {
+        consume();
+        this->type == Token::Type::LPAREN;
+      } case ')': {
+        consume();
+        this->type == Token::Type::RPAREN;
+      } case '[': {
+        consume();
+        this->type == Token::Type::LSQUARE;
+      } case ']': {
+        consume();
+        this->type == Token::Type::RSQUARE;
+      } case '{': {
+        consume();
+        this->type == Token::Type::LBRACE;
+      } case '}': {
+        consume();
+        this->type == Token::Type::RBRACE;
+      } case '.': {
+        consume();
+        this->type == Token::Type::DOT;
+      } case ',': {
+        consume();
+        this->type == Token::Type::COMMA;
+      } case ':': {
+        consume();
+        this->type == Token::Type::COLUMN;
+      } case ';': {
+        consume();
+        this->type == Token::Type::SEMICOL;
+      } case '~': {
+        consume();
+        this->type == Token::Type::BIT_NOT;
+      } default: {
+        consume();
+        this->type == Token::Type::ILLEGAL;
+      }
+    }
+
+    std::unreachable();
   }
   
   constexpr auto Tokenizer::iterator::consumeStringLiteral() noexcept -> void {
-    
     this->consume();
-    this->type = Token::Type::ILLEGAL;
+    while(this->peek() and this->peek() != '"') {
+      if(this->peek() == '\\' and this->peek(1) == '"')
+        this->consume();
+      this->consume();
+    }
+    this->consume();
+    this->type = Token::Type::STR_LITERAL;
   }
   
   constexpr auto Tokenizer::iterator::consumeCharacterLiteral() noexcept -> void {
-    
     this->consume();
-    this->type = Token::Type::ILLEGAL;
+    while(this->peek() and this->peek() != '\'') {
+      if(this->peek() == '\\' and this->peek(1) == '\'')
+        this->consume();
+      this->consume();
+    }
+    this->consume();
+    this->type = Token::Type::CHAR_LITERAL;
   }
 
 
