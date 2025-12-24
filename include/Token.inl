@@ -187,6 +187,9 @@ namespace fridayc {
     return Token::Type::IDENTIFIER;
   }
 
+  constexpr Token::Token(Type type, std::string_view literal) noexcept
+    : Token{ literal, type, 0, 0 }
+  {}
 
   constexpr Token::Token(std::string_view literal, Type type, u64 row, u64 col) noexcept 
     : literal { std::move(literal) }

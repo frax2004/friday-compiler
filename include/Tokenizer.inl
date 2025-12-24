@@ -33,19 +33,23 @@ namespace fridayc {
     , stride { 0 }
     , row { row }
     , col { col }
+    , base_row { row }
+    , base_col { col }
     , type { Token::Type::END }
   {
     this->advance();
   }
 
   constexpr auto Tokenizer::iterator::operator*() const noexcept -> Token {
-    return Token{ this->data.substr(0, this->stride), this->type, this->row, this->col };
+    return Token{ this->data.substr(0, this->stride), this->type, this->base_row, this->base_col };
   }
 
   constexpr auto Tokenizer::iterator::applyStride() noexcept -> void {
     u64 skips = std::min(this->stride, this->data.length());
     this->data.remove_prefix(skips);
     this->stride = 0;
+    this->base_row = this->row;
+    this->base_col = this->col;
   }
 
   constexpr auto Tokenizer::iterator::operator++() noexcept -> Tokenizer::iterator& {

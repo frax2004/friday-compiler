@@ -9,13 +9,14 @@ enum Token {
   IDENTIFIER,
   INT_LITERAL,
   SEMICOL
-};
+}
 
+fn main() -> int {
+  // input
+  const input: String = "let x = 10;";
 
-// input
-const input: String = "let x = 10;";
-
-// tokenizer
-const tokenizer: Tokenizer = Tokenizer.new(input);
+  // tokenizer
+  const tokenizer: Tokenizer = Tokenizer.new(input);
+}
 
 

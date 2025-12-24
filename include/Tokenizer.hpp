@@ -14,7 +14,9 @@ namespace fridayc {
       std::string_view data;
       
       private:
+      u64 base_row = 0;
       u64 row = 0;
+      u64 base_col = 0;
       u64 col = 0;
       u64 stride = 0;
       Token::Type type = Token::Type::END;
