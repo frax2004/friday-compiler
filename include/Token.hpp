@@ -38,6 +38,7 @@ namespace fridayc {
     constexpr auto getRow() const noexcept -> u64;
     constexpr auto getColumn() const noexcept -> u64;
     constexpr auto getType() const noexcept -> Type;
+    constexpr static auto identifierTypeOf(std::string_view literal) noexcept -> Token::Type;
 
     static constexpr auto values() noexcept -> std::vector<i32>;
     static constexpr auto names() noexcept -> std::vector<std::string_view>;

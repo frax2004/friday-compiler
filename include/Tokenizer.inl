@@ -67,10 +67,14 @@ namespace fridayc {
       this->consumeNumber();
     } else if(this->peek() == '/' and this->peek(1) == '/') {
       while(this->peek() and this->peek() != '\n') this->consume();
+      this->applyStride();
+      this->advance();
     } else if(std::ranges::binary_search(SYMBOLS, this->peek().unwrap())) {
       this->consumeSymbol();
     } else if(this->peek().isSpace() or this->peek().isBreak()) {
       this->consume();
+      this->applyStride();
+      this->advance();
     } else if(this->peek() == '\0') {
       *this = iterator{};
     } else {
@@ -99,164 +103,82 @@ namespace fridayc {
   
 
   constexpr auto Tokenizer::iterator::consumeIdentifier() noexcept -> void {
-    
-    this->consume();
-    this->type = Token::Type::ILLEGAL;
+    while(peek().isAlnum()) consume();
+    this->type = Token::identifierTypeOf(this->data.substr(0, this->stride));
   }
   
   constexpr auto Tokenizer::iterator::consumeNumber() noexcept -> void {
-    
-    this->consume();
-    this->type = Token::Type::ILLEGAL;
-  }
-  
-  constexpr auto Tokenizer::iterator::consumeSymbol() noexcept -> void {
-    switch(this->peek()) {
-      case '"': return this->consumeStringLiteral();
-      case '\'': return this->consumeCharacterLiteral();
-      case '=': {
-        consume();
-        if(peek() == '>') {
-          consume();
-          this->type == Token::Type::IMPLIES;
-        } else if(peek() == '=') {
-          consume();
-          this->type == Token::Type::EQUALS;
-        } else this->type == Token::Type::ASSIGN;
-        return;
-      } case '>': {
-        consume();
-        switch (peek()) {
-          case '=': {
-            consume();
-            this->type == Token::Type::GREATER_EQ;
-            return;
-          }
-          case '>': {
-            consume();
-            this->type = peek() == '=' ? (consume(), Token::Type::RSHIFT_EQ) : Token::Type::RSHIFT;
-            return;
-          }
-          default: this->type == Token::Type::GREATER;
-        }
-        std::unreachable();
-        return;
-      } case '<': {
-        consume();
-        switch (peek()) {
-          case '=': {
-            consume();
-            this->type == Token::Type::LESS_EQ;
-            return;
-          }
-          case '<': {
-            consume();
-            this->type = peek() == '=' ? (consume(), Token::Type::LSHIFT_EQ) : Token::Type::LSHIFT;
-            return;
-          }
-          default: this->type == Token::Type::LESS;
-        }
-        std::unreachable();
-        return;
-      } case '!': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::NOT_EQ;
-          return;
-        }
-        this->type == Token::Type::ILLEGAL;
-        return;
-      } case '+': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::PLUS_EQ;
-        }
-        this->type == Token::Type::PLUS;
-      } case '-': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::MINUS_EQ;
-        } else if(peek() == '>') {
-          consume();
-          this->type == Token::Type::ARROW;
-        }
-        this->type == Token::Type::MINUS;
-      } case '*': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::STAR_EQ;
-        }
-        this->type == Token::Type::STAR;
-      } case '/': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::SLASH_EQ;
-        }
-        this->type == Token::Type::SLASH;
-      } case '%': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::MODULO_EQ;
-        }
-        this->type == Token::Type::MODULO;
-      } case '&': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::BIT_AND_EQ;
-        } else this->type == Token::Type::BIT_AND;
-      } case '|': {
-        consume();
-        if(peek() == '=') {
-          consume();
-          this->type == Token::Type::BIT_OR_EQ;
-        } else this->type == Token::Type::BIT_OR;
-      } case '(': {
-        consume();
-        this->type == Token::Type::LPAREN;
-      } case ')': {
-        consume();
-        this->type == Token::Type::RPAREN;
-      } case '[': {
-        consume();
-        this->type == Token::Type::LSQUARE;
-      } case ']': {
-        consume();
-        this->type == Token::Type::RSQUARE;
-      } case '{': {
-        consume();
-        this->type == Token::Type::LBRACE;
-      } case '}': {
-        consume();
-        this->type == Token::Type::RBRACE;
-      } case '.': {
-        consume();
-        this->type == Token::Type::DOT;
-      } case ',': {
-        consume();
-        this->type == Token::Type::COMMA;
-      } case ':': {
-        consume();
-        this->type == Token::Type::COLUMN;
-      } case ';': {
-        consume();
-        this->type == Token::Type::SEMICOL;
-      } case '~': {
-        consume();
-        this->type == Token::Type::BIT_NOT;
-      } default: {
-        consume();
-        this->type == Token::Type::ILLEGAL;
-      }
+    while(peek().isDigit()) consume();
+
+    bool floating = false;
+    if(peek() == '.' and peek(1).isDigit()) {
+      floating = true;
+      consume(); // .
+      while(peek().isDigit()) consume();
     }
 
-    std::unreachable();
+    this->type = floating ? Token::Type::FLOAT_LITERAL : Token::Type::INT_LITERAL;
+  }
+  
+  constexpr auto Tokenizer::iterator::match(char expected, Token::Type success, Token::Type fallback) -> void {
+    if(this->peek() == expected) {
+      this->consume();
+      this->type = success;
+    } else this->type = fallback;
+  }
+
+  constexpr auto Tokenizer::iterator::bimatch(char expected1, char expected2, Token::Type success1, Token::Type success2, Token::Type fallback) -> void {
+    if(this->peek() == expected1) {
+      this->consume();
+      this->type = success1;
+    } else if(this->peek() == expected2) {
+      this->consume();
+      this->type = success2;
+    } else this->type = fallback;
+  }
+
+  constexpr auto Tokenizer::iterator::consumeSymbol() noexcept -> void {
+    char current = this->peek();
+    if(current == '"') return this->consumeStringLiteral();
+    else if(current == '\'') return this->consumeCharacterLiteral();
+    
+    this->consume();
+
+    switch(current) {
+      case '(': this->type = Token::Type::LPAREN; break;
+      case ')': this->type = Token::Type::RPAREN; break;
+      case '[': this->type = Token::Type::LSQUARE; break;
+      case ']': this->type = Token::Type::RSQUARE; break;
+      case '{': this->type = Token::Type::LBRACE; break;
+      case '}': this->type = Token::Type::RBRACE; break;
+      case '.': this->type = Token::Type::DOT; break;
+      case ',': this->type = Token::Type::COMMA; break;
+      case ':': this->type = Token::Type::COLUMN; break;
+      case ';': this->type = Token::Type::SEMICOL; break;
+      case '~': this->type = Token::Type::BIT_NOT; break;
+      case '+': this->match('=', Token::Type::PLUS_EQ, Token::Type::PLUS); break;
+      case '*': this->match('=', Token::Type::STAR_EQ, Token::Type::STAR); break;
+      case '/': this->match('=', Token::Type::SLASH_EQ, Token::Type::SLASH); break;
+      case '%': this->match('=', Token::Type::MODULO_EQ, Token::Type::MODULO); break;
+      case '&': this->match('=', Token::Type::BIT_AND_EQ, Token::Type::BIT_AND); break;
+      case '|': this->match('=', Token::Type::BIT_OR_EQ, Token::Type::BIT_OR); break;
+      case '!': this->match('=', Token::Type::NOT_EQ, Token::Type::ILLEGAL); break;
+      case '=': this->bimatch('>', '=', Token::Type::IMPLIES, Token::Type::EQUALS, Token::Type::ASSIGN); break;
+      case '-': this->bimatch('=', '>', Token::Type::MINUS_EQ, Token::Type::ARROW, Token::Type::MINUS); break;
+      case '>': {
+        if(this->peek() == '>') {
+          this->consume();
+          this->match('=', Token::Type::RSHIFT_EQ, Token::Type::RSHIFT);
+        } else this->match('=', Token::Type::GREATER_EQ, Token::Type::GREATER);
+        break;
+      } case '<': {
+        if(this->peek() == '<') {
+          this->consume();
+          this->match('=', Token::Type::LSHIFT_EQ, Token::Type::LSHIFT);
+        } else this->match('=', Token::Type::LESS_EQ, Token::Type::LESS);
+        break;
+      } default: this->type = Token::Type::ILLEGAL;
+    }
   }
   
   constexpr auto Tokenizer::iterator::consumeStringLiteral() noexcept -> void {

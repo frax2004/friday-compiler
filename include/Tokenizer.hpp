@@ -43,6 +43,9 @@ namespace fridayc {
       constexpr auto consumeCharacterLiteral() noexcept -> void;
       constexpr auto consumeIllegal() noexcept -> void;
       constexpr auto applyStride() noexcept -> void;
+      constexpr auto bimatch(char expected1, char expected2, Token::Type success1, Token::Type success2, Token::Type fallback) -> void;
+      constexpr auto match(char expected, Token::Type success, Token::Type fallback) -> void;
+
     };
 
     private:

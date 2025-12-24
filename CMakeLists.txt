@@ -11,7 +11,7 @@ set(PRECOMPILED_HEADERS <bits/stdc++.h> include/CTypes.hpp include/FormatString.
 
 file(GLOB ALL_SOURCES src/*.cpp)
 set(LIB_SOURCES ${ALL_SOURCES})
-list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp")
+list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 
 add_compile_options(-fconcepts-diagnostics-depth=10)
 # ---------------------------------------------------------

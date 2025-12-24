@@ -161,6 +161,33 @@ namespace fridayc {
     return std::vector<std::string_view>{ NAMES.begin(), NAMES.end() };
   }
 
+  constexpr auto Token::identifierTypeOf(std::string_view literal) noexcept -> Token::Type {
+    if("fn"sv == literal) return Token::Type::FN;
+    else if("this"sv == literal) return Token::Type::THIS;
+    else if("null"sv == literal) return Token::Type::NUL;
+    else if("true"sv == literal) return Token::Type::TRUE;
+    else if("false"sv == literal) return Token::Type::FALSE;
+    else if("return"sv == literal) return Token::Type::RETURN;
+    else if("if"sv == literal) return Token::Type::IF;
+    else if("else"sv == literal) return Token::Type::ELSE;
+    else if("elif"sv == literal) return Token::Type::ELIF;
+    else if("while"sv == literal) return Token::Type::WHILE;
+    else if("for"sv == literal) return Token::Type::FOR;
+    else if("enum"sv == literal) return Token::Type::ENUM;
+    else if("struct"sv == literal) return Token::Type::STRUCT;
+    else if("const"sv == literal) return Token::Type::CONST;
+    else if("print"sv == literal) return Token::Type::PRINT;
+    else if("let"sv == literal) return Token::Type::LET;
+    else if("using"sv == literal) return Token::Type::USING;
+    else if("namespace"sv == literal)  Token::Type::NAMESPACE;
+    else if("and"sv == literal) return Token::Type::AND;
+    else if("or"sv == literal) return Token::Type::OR;
+    else if("not"sv == literal) return Token::Type::NOT;
+    
+    return Token::Type::IDENTIFIER;
+  }
+
+
   constexpr Token::Token(std::string_view literal, Type type, u64 row, u64 col) noexcept 
     : literal { std::move(literal) }
     , row { row }

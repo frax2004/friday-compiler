@@ -22,9 +22,23 @@ constexpr auto tokenize() {
 };
 
 
+
 auto main(i32 argc, const i8* argv[]) -> i32 {
   
+  constexpr auto input = R"(
   
+  fn sum(x: int, y: int) -> int => x + y;
+  let x = 10;
+  let y = 20;
+  print x + y;
+  
+  )"sv;
+  const auto tokenizer = Tokenizer(input);
+  
+  for(const auto& token : tokenizer) {
+    std::println("Token: {} [{}] ({}:{})", token.toString(), token.getLiteral(), token.getRow(), token.getColumn());
+  }
+
 
   return 0;
 }
