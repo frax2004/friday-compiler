@@ -53,14 +53,12 @@ auto main(i32 argc, const i8* argv[]) -> i32 {
     << line.substr(col2) << '\n'
     << std::setfill(' ') << std::setw(max_digits + 4) << "" << "|  "
     << std::setfill(' ') << std::setw(col) << "" << ConsoleColor::RED << '^'
-    << std::setfill('~') << std::setw(error.length-1) << "" << ConsoleColor::WHITE << '\n'
-    ; 
+    << std::setfill('~') << std::setw(error.length-1) << "" << ConsoleColor::WHITE << std::endl;
   };
 
   if(errors.empty()) {
     std::println("{}", program.toString());
   } else std::ranges::for_each(errors, raise_error);
-  
 
   return 0;
 }
