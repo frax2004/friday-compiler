@@ -182,7 +182,7 @@ namespace fridayc {
   
   constexpr auto Double::mantissa() const noexcept -> Double {
     return Double{unwrap() - std::floor(unwrap())};
-  }  
+  }
 
   constexpr Float::Float(value_type other) noexcept
     : value { other } 

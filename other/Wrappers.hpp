@@ -2,9 +2,7 @@
 
 namespace fridayc {
 
-
   struct Boolean final {
-    
     using value_type = bool;
     using reference_type = bool&;
     using pointer_type = bool*;
@@ -18,18 +16,53 @@ namespace fridayc {
     constexpr auto operator=(Boolean&& other) noexcept -> Boolean& = default;
     constexpr auto operator=(value_type other) noexcept -> Boolean&;  
 
-    constexpr operator reference_type() noexcept;
-    constexpr operator value_type() const noexcept;
+    constexpr operator reference_type() noexcept {
+      return this->value;
+    }
 
-    constexpr auto unwrap() const noexcept -> value_type;
-    constexpr auto toString() const noexcept -> std::string;  
-    constexpr auto negate() const noexcept -> Boolean;
+    constexpr operator value_type() const noexcept {
+      return this->value;
+    }
 
-    constexpr static auto parse(std::string_view value) -> Boolean;
-    constexpr static auto wrap(value_type other) noexcept -> Boolean;  
-    constexpr static auto logicAnd(Boolean lhs, Boolean rhs) noexcept -> Boolean;
-    constexpr static auto logicOr(Boolean lhs, Boolean rhs) noexcept -> Boolean;  
-    constexpr static auto logicNot(Boolean value) noexcept -> Boolean;
+    constexpr auto unwrap() const noexcept -> value_type {
+      return this->value;
+    }
+
+    constexpr auto toString() const noexcept -> std::string {
+      return std::to_string(this->value);
+    }
+
+    constexpr auto negate() const noexcept -> Boolean {
+      return not this->value;
+    }
+
+    constexpr auto parse(std::string_view value) -> Boolean {
+      if(value == "true") return true;
+      else if(value == "false") return false;
+      else throw std::runtime_error("Failed to parse \"{}\" as Boolean"f.format(value));
+      
+      return false;
+    }
+    
+    constexpr auto wrap(value_type other) noexcept -> Boolean { 
+      return Boolean{other}; 
+    }
+    
+    constexpr auto toString() const noexcept -> std::string {
+      return std::to_string(value);
+    }
+    
+    constexpr auto logicAnd(Boolean lhs, Boolean rhs) noexcept -> Boolean {
+      return lhs and rhs;
+    }
+    
+    constexpr auto logicOr(Boolean lhs, Boolean rhs) noexcept -> Boolean {
+      return lhs or rhs;
+    }
+    
+    constexpr auto logicNot(Boolean value) noexcept -> Boolean {
+      return not value;
+    }
 
     private:
     value_type value;
@@ -45,25 +78,66 @@ namespace fridayc {
     constexpr Character(Character const&) noexcept = default;
     constexpr Character(Character &&) noexcept = default;
     constexpr Character(value_type other) noexcept;
+    constexpr Character(value_type other) noexcept
+      : value { other } 
+    {}
 
     constexpr auto operator=(Character const& other) noexcept -> Character& = default;
     constexpr auto operator=(Character&& other) noexcept -> Character& = default;
-    constexpr auto operator=(value_type other) noexcept -> Character&;
-
-    constexpr operator reference_type() noexcept;
-    constexpr operator value_type() const noexcept;
-
-    constexpr auto toString() const noexcept -> std::string;
-    constexpr auto unwrap() const noexcept -> value_type;
-    constexpr auto isAlpha() const noexcept -> bool;
-    constexpr auto isDigit() const noexcept -> bool;
-    constexpr auto isAlnum() const noexcept -> bool;
-    constexpr auto isSpace() const noexcept -> bool;
-    constexpr auto isBreak() const noexcept -> bool;
     
-    constexpr static auto parse(std::string_view value) -> Character;
-    constexpr static auto wrap(value_type other) noexcept -> Character;
-  
+    constexpr auto operator=(value_type other) noexcept -> Character& {
+      return (this->value = other), *this;
+    }  
+    
+    constexpr operator reference_type() noexcept { 
+      return this->value;
+    }
+    
+    constexpr operator value_type() const noexcept { 
+      return this->value; 
+    }
+    
+    constexpr auto unwrap() const noexcept -> value_type { 
+      return this->value; 
+    }
+    
+    constexpr auto parse(std::string_view value) -> Character {
+      return value.at(0);
+    }
+    
+    constexpr auto wrap(value_type other) noexcept -> Character { 
+      return Character{ other }; 
+    }
+    
+    constexpr auto toString() const noexcept -> std::string {
+      return std::string(1, this->value);
+    } 
+    
+    constexpr auto isAlpha() const noexcept -> bool {
+      char c = this->value;
+      return (c >= 'A' and c <= 'Z') 
+        or (c >= 'a' and c <= 'z')
+        or c == '_';
+    }
+    
+    constexpr auto isDigit() const noexcept -> bool {
+      char c = this->value;
+      return c >= '0' and c <= '9';
+    }
+    
+    constexpr auto isAlnum() const noexcept -> bool {
+      return this->isAlpha() or this->isDigit();
+    }
+    
+    constexpr auto isSpace() const noexcept -> bool {
+      char c = this->value;
+      return c == ' ' or c == '\t';
+    }
+    
+    constexpr auto isBreak() const noexcept -> bool {
+      return this->value == '\n';
+    }
+
     private:
     value_type value;
   
@@ -77,26 +151,62 @@ namespace fridayc {
     constexpr Double() noexcept = default;
     constexpr Double(Double const&) noexcept = default;
     constexpr Double(Double &&) noexcept = default;
-    constexpr Double(value_type other) noexcept;
-  
+    constexpr Double(value_type other) noexcept 
+      : value { other } 
+    {}
+
     constexpr auto operator=(Double const& other) noexcept -> Double& = default;
     constexpr auto operator=(Double&& other) noexcept -> Double& = default;
-    constexpr auto operator=(value_type other) noexcept -> Double&;
-  
-    constexpr operator reference_type() noexcept;
-    constexpr operator value_type() const noexcept;
-
-    constexpr auto unwrap() const noexcept -> value_type;
-    constexpr auto toString() const noexcept -> std::string;
-    constexpr auto mantissa() const noexcept -> Double;
     
-    constexpr static auto parse(std::string_view value) -> Double;
-    constexpr static auto wrap(value_type other) noexcept -> Double;
-    constexpr static auto sum(Double lhs, Double rhs) noexcept -> Double;
-    constexpr static auto difference(Double lhs, Double rhs) noexcept -> Double;
-    constexpr static auto product(Double lhs, Double rhs) noexcept -> Double;
-    constexpr static auto quotient(Double lhs, Double rhs) -> Double;
-  
+    constexpr auto operator=(value_type other) noexcept -> Double& {
+      return (value = other), *this;
+    }  
+      
+    constexpr operator reference_type() noexcept { 
+      return value; 
+    }
+    
+    constexpr operator value_type() const noexcept { 
+      return value; 
+    }
+    
+    constexpr auto unwrap() const noexcept -> value_type { 
+      return value; 
+    }
+    
+    constexpr auto parse(std::string_view value) -> Double {
+      return std::stod(value.data());
+    }
+    
+    constexpr auto wrap(value_type other) noexcept -> Double { 
+      return Double{other}; 
+    }
+    
+    constexpr auto toString() const noexcept -> std::string {
+      return std::to_string(value);
+    }
+    
+    constexpr auto sum(Double lhs, Double rhs) noexcept -> Double { 
+      return Double{lhs + rhs}; 
+    }
+    
+    constexpr auto difference(Double lhs, Double rhs) noexcept -> Double { 
+      return Double{lhs - rhs}; 
+    }
+    
+    constexpr auto product(Double lhs, Double rhs) noexcept -> Double { 
+      return Double{lhs * rhs}; 
+    }
+    
+    constexpr auto quotient(Double lhs, Double rhs) -> Double { 
+      if(rhs == 0.) throw std::domain_error("Division by 0.");
+      return Double{lhs / rhs}; 
+    }
+    
+    constexpr auto mantissa() const noexcept -> Double {
+      return Double{unwrap() - std::floor(unwrap())};
+    }  
+    
     private:
     value_type value;
   };
@@ -203,13 +313,28 @@ namespace fridayc {
 
 }
 
-constexpr auto operator""_I(u64 value) noexcept -> fridayc::Integer;
-constexpr auto operator""_L(u64 value) noexcept -> fridayc::Long;
-constexpr auto operator""_B(u64 value) noexcept -> fridayc::Boolean;
-constexpr auto operator""_F(long double value) noexcept -> fridayc::Float;
-constexpr auto operator""_D(long double value) noexcept -> fridayc::Double;
-constexpr auto operator""_C(i8 value) noexcept -> fridayc::Character;
+constexpr auto operator""_I(u64 value) noexcept -> fridayc::Integer {
+  return value;
+}
 
-#include "Wrappers.inl"
+constexpr auto operator""_L(u64 value) noexcept -> fridayc::Long {
+  return value;
+}
+
+constexpr auto operator""_B(u64 value) noexcept -> fridayc::Boolean {
+  return value;
+}
+
+constexpr auto operator""_F(long double value) noexcept -> fridayc::Float {
+  return value;
+} 
+
+constexpr auto operator""_D(long double value) noexcept -> fridayc::Double {
+  return value;
+}
+
+constexpr auto operator""_C(i8 value) noexcept -> fridayc::Character {
+  return value;
+}
 
 
