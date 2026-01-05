@@ -1,6 +1,6 @@
 #include "fridayc.h"
 
-u64 hash(const char* key) {
+u64 GetStringHashCode(const char* key) {
   u64 hash_value = 14695981039346656037ULL;
   
   for(; *key; ++key) {
@@ -39,7 +39,7 @@ Entry* HashTableInsert(HashTable* self, const char* key, void* value) {
     HashTableRehash(self);
   }
 
-  const u64 i = hash(key) % self->capacity;
+  const u64 i = GetStringHashCode(key) % self->capacity;
 
   Entry** iter;
   for(
@@ -60,7 +60,7 @@ Entry* HashTableInsert(HashTable* self, const char* key, void* value) {
 }
 
 bool HashTableContains(HashTable* self, const char* key) {
-  const u64 i = hash(key) % self->capacity;
+  const u64 i = GetStringHashCode(key) % self->capacity;
   
   Entry* entry;
   for(
@@ -73,7 +73,7 @@ bool HashTableContains(HashTable* self, const char* key) {
 }
 
 Entry* HashTableLookUp(HashTable* self, const char* key) {
-  const u64 i = hash(key) % self->capacity;
+  const u64 i = GetStringHashCode(key) % self->capacity;
   
   Entry* entry;
   for(
@@ -85,9 +85,9 @@ Entry* HashTableLookUp(HashTable* self, const char* key) {
   return entry;
 }
 
-void HashTableRemove(HashTable* self, const char* key) {
+bool HashTableRemove(HashTable* self, const char* key) {
 
-  const u64 i = hash(key) % self->capacity;
+  const u64 i = GetStringHashCode(key) % self->capacity;
 
   Entry** iter;
   for(
@@ -101,8 +101,10 @@ void HashTableRemove(HashTable* self, const char* key) {
     free((void*)*iter);
     *iter = temp;
     self->size -= 1;
+    return true;
   }
 
+  return false;
 }
 
 void HashTableRehash(HashTable* self) {
@@ -115,7 +117,7 @@ void HashTableRehash(HashTable* self) {
       while(entry != NULL) {
         Entry* temp = entry->next;
         
-        u64 hash_value = hash(entry->key) % capacity;
+        u64 hash_value = GetStringHashCode(entry->key) % capacity;
         entry->next = buckets[hash_value];
         buckets[hash_value] = entry;
 
@@ -143,7 +145,7 @@ void HashTablePrint(FILE* file, HashTable* self) {
       fprintf(
         file, 
         "{ \"hash\": %llu, \"entries\": [", 
-        hash(self->buckets[i]->key) % self->capacity
+        GetStringHashCode(self->buckets[i]->key) % self->capacity
       );
       fflush(file);
       for(Entry* entry = self->buckets[i]; entry != NULL; entry = entry->next) {

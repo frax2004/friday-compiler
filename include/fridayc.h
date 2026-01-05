@@ -22,6 +22,8 @@ typedef unsigned char byte;
 
 
 typedef enum Result Result;
+typedef enum TokenType TokenType;
+typedef struct Token Token;
 typedef struct Entry Entry;
 typedef struct HashTable HashTable;
 
@@ -33,72 +35,100 @@ typedef struct HashTable HashTable;
 |-------------------------------------|
 */
 
-enum Result {
-  RESULT_SUCCESS,
-  RESULT_FAILURE,
+enum TokenType {
+  TOKEN_ILLEGAL,
+  TOKEN_END,
+  TOKEN_IDENTIFIER,
+  TOKEN_INT_LIT,
+  TOKEN_FLOAT_LIT,
+  TOKEN_STR_LIT,
+  TOKEN_LET,
 };
+
+
+struct Token {
+  const char* lexeme;
+  u64 row;
+  u64 col;
+  TokenType type;  
+};
+
 
 #define HASH_TABLE_INITIAL_CAPACITY 4
 
-/// @brief Entry struct for hash table
 struct Entry {
-  /// @brief Entry key
   const char* key;
-  /// @brief Entry value
   void* value;
-  /// @brief Next entry
   Entry* next;
 };
 
-/// @brief Hash Table struct
 struct HashTable {
-  /// @brief Buckets
   Entry** buckets;
-  /// @brief Entry count
   u64 size;
-  /// @brief Buckets capacity
   u64 capacity;
 };
 
-/// @brief Hash function for strings
-/// @param key the string to hash
-/// @return The hash value for the string
-u64 hash(const char* key);
+/*
+|-------------------------------------|
+|                                     |
+|              FUNCTIONS              |
+|                                     |
+|-------------------------------------|
+*/
 
-/// @brief Create an hash table
-/// @return Empty initialized hash table with initial capacity
+// Token related functions
+
+const char* TokenTypeToString(TokenType type);
+Token       TokenCreate(const char* lexeme, TokenType type);
+Token       TokenCreateEx(const char* lexeme, TokenType type, u64 row, u64 col);
+Token       TokenFromIdentifier(const char* lexeme, u64 row, u64 col);
+i32         TokenCompare(const Token lhs, const Token rhs);
+bool        TokenEquals(const Token lhs, const Token rhs);
+
+// Compiler related functions
+
+bool  IsAlpha(char c);
+bool  IsDigit(char c);
+bool  IsBreak(char c);
+bool  IsSpace(char c);
+bool  IsSymbol(char c);
+byte* Compile(const char* code);
+
+
+// Interpreter related functions
+
+i32 Interpret(byte* bytecode);
+
+
+// IO related functions
+
+char* ReadFile(const char* path);
+
+// Data structures related functions
+
+u64       GetStringHashCode(const char* key);
 HashTable HashTableCreate();
+Entry*    HashTableLookUp(HashTable* self, const char* key);
+Entry*    HashTableInsert(HashTable* self, const char* key, void* value);
+bool      HashTableRemove(HashTable* self, const char* key);
+bool      HashTableContains(HashTable* self, const char* key);
+void      HashTableRehash(HashTable* self);
+void      HashTableDestroy(HashTable* self);
 
-/// @brief Get the value mapped with `key` or **NULL** if `key` is not mapped 
-/// @param self the hash table
-/// @param key the key
-/// @return Entry mapped with the key or NULL
-Entry* HashTableLookUp(HashTable* self, const char* key);
+/*
+|-------------------------------------|
+|                                     |
+|             STATIC DATA             |
+|                                     |
+|-------------------------------------|
+*/
 
-/// @brief Inserts an entry in the hash table or change the value mapped with `key` if it was already mapped
-/// @param self the hash table
-/// @param key the key
-/// @param value the value
-/// @return Entry to the new mapped entry or the existing entry
-Entry* HashTableInsert(HashTable* self, const char* key, void* value);
+static const Token TOKENS[] = {
+  [TOKEN_LET]     = (Token) { .lexeme = "let",     .type = TOKEN_LET     },
+  [TOKEN_ILLEGAL] = (Token) { .lexeme = "ILLEGAL", .type = TOKEN_ILLEGAL },
+  [TOKEN_END]     = (Token) { .lexeme = "EOF",     .type = TOKEN_END     },
+};
 
-/// @brief Remove the entry with the same key
-/// @param self the hash table
-/// @param key the key
-void HashTableRemove(HashTable* self, const char* key);
 
-/// @brief Lookup the hash table to find the given key
-/// @param self the hash table
-/// @param key the key
-/// @return `true` if the key is mapped in the hash table
-bool HashTableContains(HashTable* self, const char* key);
-
-/// @brief Rehash the hash table (called when `size/capacity >= load factor`)
-/// @param self the hash table
-void HashTableRehash(HashTable* self);
-
-/// @brief Destroy the hash table
-/// @param self the hash table
-void HashTableDestroy(HashTable* self);
 
 #endif

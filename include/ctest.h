@@ -6,5 +6,7 @@
 #define assertFalse(condition) assertCheck(!(condition), # condition " should be false, but resulted to true")
 #define assertEquals(expected, actual) assertCheck((expected) == (actual), # expected " should be equal to " #actual ", but equality is not satisfied")
 #define assertNotEquals(expected, actual) assertCheck((expected) != (actual), # expected " should be different from " #actual ", but inequality is not satisfied")
+#define assertNull(expression) assertCheck((expression) == NULL, # expression " should be null, but it is not null")
+#define assertNotNull(expression) assertCheck((expression) != NULL, # expression " should not be null, but it is null")
 
 #endif
